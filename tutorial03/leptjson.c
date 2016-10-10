@@ -5,6 +5,12 @@
 #include <stdlib.h>  /* NULL, malloc(), realloc(), free(), strtod() */
 #include <string.h>  /* memcpy() */
 
+#ifdef _WINDOWS
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h> 
+#endif // _WINDOWS
+
+
 #ifndef LEPT_PARSE_STACK_INIT_SIZE
 #define LEPT_PARSE_STACK_INIT_SIZE 256
 #endif
@@ -105,7 +111,7 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
         case '\\':
             ch = *p++;
             switch (ch) {
-            case '\"': case'\\': case '\/': PUTC(c, ch); break;
+            case '\"': case'\\': case '/': PUTC(c, ch); break;
             case 'b': PUTC(c, '\b'); break;
             case 'f': PUTC(c, '\f'); break;
             case 'n': PUTC(c, '\n'); break;
@@ -169,11 +175,10 @@ lept_type lept_get_type(const lept_value* v) {
 
 int lept_get_boolean(const lept_value* v) {
     assert(v != NULL && (v->type == LEPT_TRUE || v->type == LEPT_FALSE));
-    return v->type == LEPT_TRUE ? 1 : 0;
+    return v->type == LEPT_TRUE ;
 }
 
 void lept_set_boolean(lept_value* v, int b) {
-    assert(v != NULL);
     lept_free(v);
     v->type = b ? LEPT_TRUE : LEPT_FALSE;
 }
@@ -184,7 +189,6 @@ double lept_get_number(const lept_value* v) {
 }
 
 void lept_set_number(lept_value* v, double n) {
-    assert(v != NULL);
     lept_free(v);
     v->u.n = n;
     v->type = LEPT_NUMBER;
